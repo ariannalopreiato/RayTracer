@@ -12,9 +12,21 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+			float a = Vector3::Dot(ray.direction, ray.direction);
+			float b = Vector3::Dot(ray.direction * 2, ray.origin - sphere.origin);
+			float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
+			float discriminant = (b * b) - (4 * a * c);
+
+			bool didHit{};
+			if (discriminant <= 0) //the ray does not intersect the sphere or is tangent to it
+				didHit = false;
+			else 
+				didHit = true;	
+
+			if (!ignoreHitRecord)
+				hitRecord.didHit = didHit;
+
+			return didHit;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
