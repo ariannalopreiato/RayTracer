@@ -12,16 +12,25 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
+			//intersection of ray with sphere
 			float a = Vector3::Dot(ray.direction, ray.direction);
-			float b = Vector3::Dot(ray.direction * 2, ray.origin - sphere.origin);
+			float b = Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin);
 			float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
-			float discriminant = (b * b) - (4 * a * c);
+			float discriminant = (b * b) - (4 * a * c); 
 
-			bool didHit{};
+			bool didHit{ false };
 			if (discriminant <= 0) //the ray does not intersect the sphere or is tangent to it
 				didHit = false;
-			else 
-				didHit = true;	
+			else
+			{		
+				didHit = true;
+				float solutionOne = (-b - sqrt(discriminant)) / (2 * a);
+				float solutionTwo = (-b + sqrt(discriminant)) / (2 * a);
+				if (solutionOne >= ray.min && solutionOne < ray.max)
+					hitRecord.t = solutionOne;
+				else if(solutionTwo >= ray.min && solutionTwo < ray.max)
+					hitRecord.t = solutionTwo;
+			}
 
 			if (!ignoreHitRecord)
 				hitRecord.didHit = didHit;
@@ -40,7 +49,7 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
+			//assert(false && "No Implemented Yet!");
 			return false;
 		}
 
