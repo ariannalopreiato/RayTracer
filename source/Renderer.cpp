@@ -29,7 +29,7 @@ void Renderer::Render(Scene* pScene) const
 
 	for (int px{}; px < m_Width; ++px)
 	{
-		float x = float(((2 * (px + 0.5)) / m_Width) - 1) * (m_Width / m_Height);
+		float x = float(((2 * (px + 0.5)) / m_Width) - 1) * float(m_Width) / float(m_Height);
 
 		for (int py{}; py < m_Height; ++py)
 		{
@@ -48,9 +48,11 @@ void Renderer::Render(Scene* pScene) const
 			Ray hitRay{ {0,0,0}, rayDirection };
 			ColorRGB finalColor{};
 			HitRecord closestHit{};
-			Sphere testSphere{ {0.f, 0.f, 100.f}, 50.f, 0 };
+			//Sphere testSphere{ {0.f, 0.f, 100.f}, 50.f, 0 };
 
-			GeometryUtils::HitTest_Sphere(testSphere, hitRay, closestHit);
+			//GeometryUtils::HitTest_Sphere(testSphere, hitRay, closestHit);
+
+			pScene->GetClosestHit(hitRay, closestHit);
 
 			if (closestHit.didHit)
 			{

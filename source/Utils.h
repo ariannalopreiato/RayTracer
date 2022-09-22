@@ -13,8 +13,9 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//intersection of ray with sphere
-			float a = Vector3::Dot(ray.direction, ray.direction);
-			float b = Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin);
+			Vector3 normalizedDir = ray.direction.Normalized();
+			float a = Vector3::Dot(normalizedDir, normalizedDir);
+			float b = Vector3::Dot(2 * normalizedDir, ray.origin - sphere.origin);
 			float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
 			float discriminant = (b * b) - (4 * a * c); 
 
