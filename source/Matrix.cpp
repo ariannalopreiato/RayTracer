@@ -116,13 +116,22 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
-		//todo W1
-		assert(false && "Not Implemented Yet");
+		//todo w1
+		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
+		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
+		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
+		//Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		//return Matrix{ xAxis, yAxis, zAxis, t };
 		return {};
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
+		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
+		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
+		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
+		//Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		//return Matrix{ xAxis, yAxis, zAxis, t };
 		//todo W1
 		assert(false && "Not Implemented Yet");
 		return {};
@@ -130,6 +139,11 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
+		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
+		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
+		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
+		//Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		//return Matrix{ xAxis, yAxis, zAxis, t };
 		//todo W1
 		assert(false && "Not Implemented Yet");
 		return {};
@@ -149,9 +163,11 @@ namespace dae {
 
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
-		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 xAxis{ sx, 0.f, 0.f , 0.f };
+		Vector4 yAxis{ 0.f, sy, 0.f , 0.f };
+		Vector4 zAxis{ 0.f, 0.f, sz , 0.f };
+		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		return Matrix{ xAxis, yAxis, zAxis, t };
 	}
 
 	Matrix Matrix::CreateScale(const Vector3& s)

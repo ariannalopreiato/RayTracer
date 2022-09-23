@@ -17,26 +17,25 @@ namespace dae
 			float a = Vector3::Dot(normalizedDir, normalizedDir);
 			float b = Vector3::Dot(2 * normalizedDir, ray.origin - sphere.origin);
 			float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
-			float discriminant = (b * b) - (4 * a * c); 
+			float discriminant = (b * b) - (4 * a * c);
 
-			bool didHit{ false };
-			if (discriminant <= 0) //the ray does not intersect the sphere or is tangent to it
-				didHit = false;
-			else
-			{		
-				didHit = true;
-				float solutionOne = (-b - sqrt(discriminant)) / (2 * a);
-				float solutionTwo = (-b + sqrt(discriminant)) / (2 * a);
-				if (solutionOne >= ray.min && solutionOne < ray.max)
-					hitRecord.t = solutionOne;
-				else if(solutionTwo >= ray.min && solutionTwo < ray.max)
-					hitRecord.t = solutionTwo;
+			if (discriminant <= 0.f) //the ray does not intersect the sphere or is tangent to it
+				return false;
+
+			if (ignoreHitRecord) //if hitRecord is ignored 
+				return true;
+
+			float hit = (-b - sqrt(discriminant)) / (2 * a);
+			if (hit < ray.min)
+				hit = (-b + sqrt(discriminant)) / (2 * a);
+			if (hit < hitRecord.t)
+			{
+				hitRecord.t = hit;
+				hitRecord.origin = ray.origin + (hit * normalizedDir);
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
 			}
-
-			if (!ignoreHitRecord)
-				hitRecord.didHit = didHit;
-
-			return didHit;
+			return true;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
@@ -49,8 +48,22 @@ namespace dae
 		//PLANE HIT-TESTS
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			//assert(false && "No Implemented Yet!");
+			//intersection of ray with plane
+			Vector3 normalizedDir = ray.direction.Normalized();
+
+			if (ignoreHitRecord) //if hitRecord is ignored 
+				return true;
+
+			float hit = Vector3::Dot(plane.origin - ray.origin, plane.normal) / Vector3::Dot(normalizedDir, plane.normal);
+		
+			if (hit < hitRecord.t && hit >= ray.min && hit < ray.max)
+			{
+				hitRecord.t = hit;
+				hitRecord.origin = ray.origin + (hit * normalizedDir);
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = plane.materialIndex; //gives to the pixel the material of the object it hits
+				return true;
+			}
 			return false;
 		}
 

@@ -27,8 +27,15 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		//todo W1
-		assert(false && "No Implemented Yet!");
+		for (auto plane = 0; plane < m_PlaneGeometries.size(); ++plane)
+		{
+			GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit); //checks if the ray hits the plane
+		}
+
+		for (auto sphere = 0; sphere < m_SphereGeometries.size(); ++sphere)
+		{
+			GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, closestHit); //checks if the ray hits the sphere
+		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
