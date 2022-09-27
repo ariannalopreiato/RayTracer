@@ -104,12 +104,11 @@ namespace dae {
 
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
-		//todo W1
-		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
-		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
-		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
+		Vector4 xAxis{ 1.f, 0.f, 0.f , x };
+		Vector4 yAxis{ 0.f, 1.f, 0.f , y };
+		Vector4 zAxis{ 0.f, 0.f, 1.f , z };
 		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
-		//return Matrix{ xAxis, yAxis, zAxis, t };
+		return Matrix{ xAxis, yAxis, zAxis, t };
 		return {};
 	}
 
@@ -120,41 +119,37 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
-		//todo w1
-		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
-		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
-		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
-		//Vector4 t{ 0.f, 0.f, 0.f, 1.f };
-		//return Matrix{ xAxis, yAxis, zAxis, t };
-		return {};
+		Vector4 xAxis{ 1.0f, 0.f, 0.f, 0.f };
+		Vector4 yAxis{ 0.f, cos(pitch), -sin(pitch) , 0.f};
+		Vector4 zAxis{ 0.f, sin(pitch), cos(pitch) , 0.f};
+		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		return Matrix{ xAxis, yAxis, zAxis, t };
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
-		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
-		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
-		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
-		//Vector4 t{ 0.f, 0.f, 0.f, 1.f };
-		//return Matrix{ xAxis, yAxis, zAxis, t };
-		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 xAxis{ cos(yaw), 0.f, -sin(yaw), 0.f};
+		Vector4 yAxis{ 0.f, 1.f, 0.f, 0.f };
+		Vector4 zAxis{ sin(yaw), 0.f, cos(yaw), 0.f};
+		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		return Matrix{ xAxis, yAxis, zAxis, t };
 	}
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
-		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
-		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
-		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
-		//Vector4 t{ 0.f, 0.f, 0.f, 1.f };
-		//return Matrix{ xAxis, yAxis, zAxis, t };
-		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 xAxis{ cos(roll), sin(roll), 0.f, 0.f};
+		Vector4 yAxis{ -sin(roll), cos(roll), 0.f , 0.f};
+		Vector4 zAxis{ 0.f, 0.f, 1.f , 0.f };
+		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		return Matrix{ xAxis, yAxis, zAxis, t };
 	}
 
 	Matrix Matrix::CreateRotation(const Vector3& r)
 	{
+		CreateRotationX(r.x);
+		CreateRotationY(r.y);
+		CreateRotationZ(r.z);
+
 		//todo W1
 		assert(false && "Not Implemented Yet");
 		return {};

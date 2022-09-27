@@ -22,8 +22,9 @@ namespace dae
 		Vector3 origin{};
 		float fovAngle{90.f};
 
-		Vector3 forward{ 0.266f, -0.453f, 0.860f };
-		//Vector3 forward{ Vector3::UnitZ };
+		float moveFactor{ 1.f };
+
+		Vector3 forward{ Vector3::UnitZ };
 		Vector3 up{Vector3::UnitY};
 		Vector3 right{Vector3::UnitX};
 
@@ -46,14 +47,35 @@ namespace dae
 
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-
+			if (pKeyboardState[SDL_SCANCODE_W])
+				origin.z += moveFactor;
+			if (pKeyboardState[SDL_SCANCODE_S])
+				origin.z -= moveFactor;
+			if (pKeyboardState[SDL_SCANCODE_A])
+				origin.x -= moveFactor;
+			if (pKeyboardState[SDL_SCANCODE_D])
+				origin.x += moveFactor;
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
-
-			//todo: W2
-			//assert(false && "Not Implemented Yet");
+			if ((mouseState & SDL_BUTTON_LMASK) != 0)
+			{
+				if ((mouseState & SDL_BUTTON_RMASK) != 0)
+				{
+					if (mouseY < 0)
+						origin.y -= moveFactor;
+					if (mouseY > 0)
+						origin.y += moveFactor;
+				}
+				else
+				{
+					if (mouseY < 0)
+						origin.z += moveFactor;
+					if (mouseY > 0)
+						origin.z -= moveFactor;
+				}
+			}
 		}
 	};
 }
