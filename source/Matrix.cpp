@@ -105,7 +105,11 @@ namespace dae {
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
+		//Vector4 xAxis{ 1.0f, 0.f, 0.f , 0.f };
+		//Vector4 yAxis{ 0.f, cos, -sin , 0.f };
+		//Vector4 zAxis{ 0.f, sin, cos , 0.f };
+		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
+		//return Matrix{ xAxis, yAxis, zAxis, t };
 		return {};
 	}
 

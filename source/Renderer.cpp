@@ -26,14 +26,17 @@ void Renderer::Render(Scene* pScene) const
 	Camera& camera = pScene->GetCamera();
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
+	
+	float fov = std::tan((camera.fovAngle * M_PI / 180) / 2);
+	float aspectRatio = float(m_Width) / float(m_Height);
 
 	for (int px{}; px < m_Width; ++px)
 	{
-		float x = float(((2 * (px + 0.5)) / m_Width) - 1) * float(m_Width) / float(m_Height);
+		float x = float(((2 * (px + 0.5)) / m_Width) - 1) * aspectRatio * fov;
 
 		for (int py{}; py < m_Height; ++py)
 		{
-			float y = 1 - float((2 * (py + 0.5)) / m_Height);
+			float y = (1 - float((2 * (py + 0.5)) / m_Height)) * fov;
 
 			//float gradient = px / static_cast<float>(m_Width);
 			//gradient += py / static_cast<float>(m_Width);
@@ -44,15 +47,13 @@ void Renderer::Render(Scene* pScene) const
 			//Ray hitRay{ {0,0,0}, rayDirection };
 			//ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
 
-			Vector3 rayDirection{ x, y, 1 };
-			Ray hitRay{ {0,0,0}, rayDirection };
+			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
+			Vector3 rayDirection = cameraToWorld.TransformVector({ x,y,1 });
+			Ray hitRay{ camera.origin, rayDirection };
 			ColorRGB finalColor{};
 			HitRecord closestHit{};
 
-			Plane testPlane{ {0.f, -50.f, 0.f}, {0.f, 1.f, 0.f}, 0 };
-
 			pScene->GetClosestHit(hitRay, closestHit);
-			//GeometryUtils::HitTest_Plane(testPlane, hitRay, closestHit);
 
 			if (closestHit.didHit)
 			{				

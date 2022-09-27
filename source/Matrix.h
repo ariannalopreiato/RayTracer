@@ -24,6 +24,7 @@ namespace dae {
 		Vector3 TransformVector(float x, float y, float z) const;
 		Vector3 TransformPoint(const Vector3& p) const;
 		Vector3 TransformPoint(float x, float y, float z) const;
+		//Vector3 MultiplyByVector(const Vector3& v);
 		const Matrix& Transpose();
 
 		Vector3 GetAxisX() const;
@@ -52,10 +53,10 @@ namespace dae {
 		//Row-Major Matrix
 		Vector4 data[4]
 		{
-			{1,0,0,0}, //xAxis
-			{0,1,0,0}, //yAxis
-			{0,0,1,0}, //zAxis
-			{0,0,0,1}  //T
+			{1,0,0,0}, //xAxis data 0
+			{0,1,0,0}, //yAxis data 1
+			{0,0,1,0}, //zAxis data 2
+			{0,0,0,1}  //T     data 3
 		};
 
 		// v0x v0y v0z v0w
