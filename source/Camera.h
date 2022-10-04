@@ -22,14 +22,14 @@ namespace dae
 		Vector3 origin{};
 		float fovAngle{90.f};
 
-		float moveFactor{ 1.f };
+		float moveFactor{ 0.f };
 
 		Vector3 forward{ Vector3::UnitZ };
 		Vector3 up{Vector3::UnitY};
 		Vector3 right{Vector3::UnitX};
 
-		float totalPitch{0.f};
-		float totalYaw{0.f};
+		float totalPitch{ 0.f };
+		float totalYaw{ 0.f };
 
 		Matrix cameraToWorld{};
 
@@ -43,8 +43,9 @@ namespace dae
 
 		void Update(Timer* pTimer)
 		{
-			const float deltaTime = pTimer->GetElapsed();
+			moveFactor = 1.f;
 
+			const float deltaTime = pTimer->GetElapsed();
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 			if (pKeyboardState[SDL_SCANCODE_W])
@@ -61,12 +62,14 @@ namespace dae
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 			if ((mouseState & SDL_BUTTON_LMASK) != 0)
 			{
+				if (pKeyboardState[SDL_SCANCODE_LSHIFT] || pKeyboardState[SDL_SCANCODE_RSHIFT])
+					moveFactor += 4.f;
 				if ((mouseState & SDL_BUTTON_RMASK) != 0)
 				{
 					if (mouseY < 0)
 						origin.y -= moveFactor;
 					if (mouseY > 0)
-						origin.y += moveFactor;
+						origin.y += moveFactor;				
 				}
 				else
 				{
@@ -74,8 +77,21 @@ namespace dae
 						origin.z += moveFactor;
 					if (mouseY > 0)
 						origin.z -= moveFactor;
+
+					totalYaw += mouseX * deltaTime;
 				}
 			}
+			else 
+			{
+				if ((mouseState & SDL_BUTTON_RMASK) != 0)
+				{
+					totalPitch -= mouseY * deltaTime;
+					totalYaw += mouseX * deltaTime;
+				}
+			}
+			Matrix rotation = Matrix::CreateRotation(totalPitch, totalYaw, 0.f);
+			forward = rotation.TransformVector(Vector3::UnitZ);
+			forward.Normalize();
 		}
 	};
 }

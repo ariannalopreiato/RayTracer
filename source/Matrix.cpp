@@ -119,6 +119,7 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
+		pitch *= TO_RADIANS;
 		Vector4 xAxis{ 1.0f, 0.f, 0.f, 0.f };
 		Vector4 yAxis{ 0.f, cos(pitch), -sin(pitch) , 0.f};
 		Vector4 zAxis{ 0.f, sin(pitch), cos(pitch) , 0.f};
@@ -128,6 +129,7 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
+		yaw *= TO_RADIANS;
 		Vector4 xAxis{ cos(yaw), 0.f, -sin(yaw), 0.f};
 		Vector4 yAxis{ 0.f, 1.f, 0.f, 0.f };
 		Vector4 zAxis{ sin(yaw), 0.f, cos(yaw), 0.f};
@@ -137,6 +139,7 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
+		roll *= TO_RADIANS;
 		Vector4 xAxis{ cos(roll), sin(roll), 0.f, 0.f};
 		Vector4 yAxis{ -sin(roll), cos(roll), 0.f , 0.f};
 		Vector4 zAxis{ 0.f, 0.f, 1.f , 0.f };
@@ -146,13 +149,12 @@ namespace dae {
 
 	Matrix Matrix::CreateRotation(const Vector3& r)
 	{
-		CreateRotationX(r.x);
-		CreateRotationY(r.y);
-		CreateRotationZ(r.z);
+		auto x = CreateRotationX(r.x);
+		auto y = CreateRotationY(r.y);
+		auto z = CreateRotationZ(r.z);
 
-		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		auto mh = z * x * y;
+		return { mh };
 	}
 
 	Matrix Matrix::CreateRotation(float pitch, float yaw, float roll)

@@ -54,6 +54,9 @@ void Renderer::Render(Scene* pScene) const
 			HitRecord closestHit{};
 
 			pScene->GetClosestHit(hitRay, closestHit);
+			pScene->DoesHit(hitRay);
+			auto light = pScene->GetLights();
+			LightUtils::GetDirectionToLight(light[0], rayDirection);
 
 			if (closestHit.didHit)
 			{				
