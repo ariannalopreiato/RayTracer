@@ -109,7 +109,6 @@ namespace dae {
 		Vector4 zAxis{ 0.f, 0.f, 1.f , z };
 		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
 		return Matrix{ xAxis, yAxis, zAxis, t };
-		return {};
 	}
 
 	Matrix Matrix::CreateTranslation(const Vector3& t)
@@ -153,8 +152,7 @@ namespace dae {
 		auto y = CreateRotationY(r.y);
 		auto z = CreateRotationZ(r.z);
 
-		auto mh = z * x * y;
-		return { mh };
+		return { x * y * z };
 	}
 
 	Matrix Matrix::CreateRotation(float pitch, float yaw, float roll)

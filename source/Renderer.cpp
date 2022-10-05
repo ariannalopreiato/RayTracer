@@ -42,7 +42,6 @@ void Renderer::Render(Scene* pScene) const
 			//gradient += py / static_cast<float>(m_Width);
 			//gradient /= 2.0f;
 			//ColorRGB finalColor{ gradient, gradient, gradient };
-
 			//Vector3 rayDirection{ x, y, 1 };
 			//Ray hitRay{ {0,0,0}, rayDirection };
 			//ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
@@ -52,17 +51,22 @@ void Renderer::Render(Scene* pScene) const
 			Ray hitRay{ camera.origin, rayDirection };
 			ColorRGB finalColor{};
 			HitRecord closestHit{};
-
 			pScene->GetClosestHit(hitRay, closestHit);
-			pScene->DoesHit(hitRay);
-			auto light = pScene->GetLights();
-			LightUtils::GetDirectionToLight(light[0], rayDirection);
 
 			if (closestHit.didHit)
 			{				
-				finalColor = materials[closestHit.materialIndex]->Shade();
-				//const float scaled_t = (closestHit.t - 50.f) / 40.f;
-				//finalColor = { scaled_t, scaled_t, scaled_t };
+				finalColor = materials[closestHit.materialIndex]->Shade(); //if it hits the pixel give it color
+
+				auto lights = pScene->GetLights(); //get all the lights of the scene
+
+				for (const auto& light : lights) //loop all lights
+				{	
+					Vector3 startPoint = closestHit.origin + closestHit.normal * 0.01f; //the point that just got hit
+					Vector3 direction = LightUtils::GetDirectionToLight(light, startPoint); //vector from hit point to light
+					Ray lightRay{ startPoint, direction }; //calculate the light ray
+					if (pScene->DoesHit(lightRay))
+						finalColor *= 0.5;
+				}
 			}
 
 			//Update Color in Buffer

@@ -22,20 +22,22 @@ namespace dae
 			if (discriminant <= 0.f) //the ray does not intersect the sphere or is tangent to it
 				return false;
 
-			if (ignoreHitRecord) //if hitRecord is ignored 
-				return true;
-
 			float hit = (-b - sqrt(discriminant)) / (2 * a);
 			if (hit < ray.min)
 				hit = (-b + sqrt(discriminant)) / (2 * a);
-			if (hit < hitRecord.t)
+			if (hit >= ray.min && hit < ray.max)
 			{
+				if (ignoreHitRecord) //if hitRecord is ignored 
+					return true;
+
 				hitRecord.t = hit;
 				hitRecord.origin = ray.origin + (hit * normalizedDir);
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
+				hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
+				return true;
 			}
-			return true;
+			return false;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
@@ -51,17 +53,18 @@ namespace dae
 			//intersection of ray with plane
 			Vector3 normalizedDir = ray.direction.Normalized();
 
-			if (ignoreHitRecord) //if hitRecord is ignored 
-				return true;
-
 			float hit = Vector3::Dot(plane.origin - ray.origin, plane.normal) / Vector3::Dot(normalizedDir, plane.normal);
 		
-			if (hit < hitRecord.t && hit >= ray.min && hit < ray.max)
+			if (hit >= ray.min && hit < ray.max)
 			{
+				if (ignoreHitRecord) //if hitRecord is ignored 
+					return true;
+
 				hitRecord.t = hit;
 				hitRecord.origin = ray.origin + (hit * normalizedDir);
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex; //gives to the pixel the material of the object it hits
+				hitRecord.normal = plane.normal;
 				return true;
 			}
 			return false;
@@ -109,8 +112,10 @@ namespace dae
 		//Direction from target to light
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
-			auto vector = light.origin - origin;
-			return vector;
+			if (light.type == LightType::Directional) //directional light doesn't have an origin
+				return -light.direction.Normalized() * FLT_MAX;
+			else
+				return light.origin - origin;
 		}
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)

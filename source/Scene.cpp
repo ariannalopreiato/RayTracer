@@ -27,28 +27,36 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
+		HitRecord currentHit{};
+		closestHit.t = ray.max;
+
 		for (auto plane = 0; plane < m_PlaneGeometries.size(); ++plane)
 		{
-			GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit); //checks if the ray hits the plane
+			GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, currentHit); //checks if the ray hits the plane
+			if (currentHit.t < closestHit.t)
+				closestHit = currentHit;
 		}
-
 		for (auto sphere = 0; sphere < m_SphereGeometries.size(); ++sphere)
 		{
-			GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, closestHit); //checks if the ray hits the sphere
+			GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, currentHit); //checks if the ray hits the sphere
+			if (currentHit.t < closestHit.t)
+				closestHit = currentHit;
 		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
 		HitRecord closestHit{};
-		for (auto plane = 0; plane < m_PlaneGeometries.size(); ++plane)
-		{
-			GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit, false); //checks if the ray hits the plane
-		}
+		//for (auto plane = 0; plane < m_PlaneGeometries.size(); ++plane)
+		//{
+		//	if (GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit, true)) //checks if the ray hits the plane
+		//		return true;
+		//}
 
 		for (auto sphere = 0; sphere < m_SphereGeometries.size(); ++sphere)
 		{
-			GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, closestHit, false); //checks if the ray hits the sphere
+			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, closestHit, true)) //checks if the ray hits the sphere
+				return true;
 		}
 
 		return false;
