@@ -13,9 +13,8 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//intersection of ray with sphere
-			Vector3 normalizedDir = ray.direction.Normalized();
-			float a = Vector3::Dot(normalizedDir, normalizedDir);
-			float b = Vector3::Dot(2 * normalizedDir, ray.origin - sphere.origin);
+			float a = Vector3::Dot(ray.direction, ray.direction);
+			float b = Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin);
 			float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
 			float discriminant = (b * b) - (4 * a * c);
 
@@ -31,7 +30,7 @@ namespace dae
 					return true;
 
 				hitRecord.t = hit;
-				hitRecord.origin = ray.origin + (hit * normalizedDir);
+				hitRecord.origin = ray.origin + (hit * ray.direction);
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
 				hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
@@ -51,9 +50,7 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//intersection of ray with plane
-			Vector3 normalizedDir = ray.direction.Normalized();
-
-			float hit = Vector3::Dot(plane.origin - ray.origin, plane.normal) / Vector3::Dot(normalizedDir, plane.normal);
+			float hit = Vector3::Dot(plane.origin - ray.origin, plane.normal) / Vector3::Dot(ray.direction, plane.normal);
 		
 			if (hit >= ray.min && hit < ray.max)
 			{
@@ -61,7 +58,7 @@ namespace dae
 					return true;
 
 				hitRecord.t = hit;
-				hitRecord.origin = ray.origin + (hit * normalizedDir);
+				hitRecord.origin = ray.origin + (hit * ray.direction);
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex; //gives to the pixel the material of the object it hits
 				hitRecord.normal = plane.normal;

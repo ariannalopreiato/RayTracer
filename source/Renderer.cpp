@@ -64,6 +64,7 @@ void Renderer::Render(Scene* pScene) const
 					Vector3 startPoint = closestHit.origin + closestHit.normal * 0.01f; //the point that just got hit
 					Vector3 direction = LightUtils::GetDirectionToLight(light, startPoint); //vector from hit point to light
 					Ray lightRay{ startPoint, direction }; //calculate the light ray
+					lightRay.max = lightRay.direction.Normalize();
 					if (pScene->DoesHit(lightRay))
 						finalColor *= 0.5;
 				}

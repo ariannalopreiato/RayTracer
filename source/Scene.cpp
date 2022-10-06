@@ -47,11 +47,11 @@ namespace dae {
 	bool Scene::DoesHit(const Ray& ray) const
 	{
 		HitRecord closestHit{};
-		//for (auto plane = 0; plane < m_PlaneGeometries.size(); ++plane)
-		//{
-		//	if (GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit, true)) //checks if the ray hits the plane
-		//		return true;
-		//}
+		for (auto plane = 0; plane < m_PlaneGeometries.size(); ++plane)
+		{
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit, true)) //checks if the ray hits the plane
+				return true;
+		}
 
 		for (auto sphere = 0; sphere < m_SphereGeometries.size(); ++sphere)
 		{
