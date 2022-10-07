@@ -48,23 +48,31 @@ void Renderer::Render(Scene* pScene) const
 
 			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
 			Vector3 rayDirection = cameraToWorld.TransformVector({ x,y,1 });
-			Ray hitRay{ camera.origin, rayDirection };
+			Ray viewRay{ camera.origin, rayDirection };
 			ColorRGB finalColor{};
 			HitRecord closestHit{};
-			pScene->GetClosestHit(hitRay, closestHit);
+			pScene->GetClosestHit(viewRay, closestHit);
 
 			if (closestHit.didHit)
-			{				
-				finalColor = materials[closestHit.materialIndex]->Shade(); //if it hits the pixel give it color
+			{
+				//finalColor = materials[closestHit.materialIndex]->Shade(); //if it hits the pixel give it color
 
 				auto lights = pScene->GetLights(); //get all the lights of the scene
 
 				for (const auto& light : lights) //loop all lights
-				{	
+				{
 					Vector3 startPoint = closestHit.origin + closestHit.normal * 0.01f; //the point that just got hit
 					Vector3 direction = LightUtils::GetDirectionToLight(light, startPoint); //vector from hit point to light
 					Ray lightRay{ startPoint, direction }; //calculate the light ray
 					lightRay.max = lightRay.direction.Normalize();
+
+					float lambertLaw = Vector3::Dot(closestHit.normal, direction.Normalized());
+					if (lambertLaw > 0)
+					{
+						auto brdf = materials[closestHit.materialIndex]->Shade(closestHit, -lightRay.direction, rayDirection);
+						auto radiance = LightUtils::GetRadiance(light, startPoint);
+						finalColor += radiance * brdf * lambertLaw;
+					}
 					if (pScene->DoesHit(lightRay))
 						finalColor *= 0.5;
 				}
