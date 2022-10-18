@@ -106,8 +106,29 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo w3
-			return{};
+			Vector3 halfVector = ((v + l) / (v + l).Magnitude()).Normalized();
+			ColorRGB f0{};
+
+			if (m_Metalness < 0.001f && m_Metalness > -0.001f)
+				f0 = { 0.04f, 0.04f, 0.04f }; 
+			else
+				f0 = m_Albedo;
+
+			ColorRGB f = BRDF::FresnelFunction_Schlick(halfVector, v, f0);
+			float d = BRDF::NormalDistribution_GGX(hitRecord.normal, halfVector, m_Roughness * m_Roughness);
+			float g = BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness * m_Roughness);
+
+			float denominator = 4 * Vector3::Dot(v, hitRecord.normal) * Vector3::Dot(l, hitRecord.normal);
+			//ColorRGB ks = ;
+			ColorRGB kd{};
+			if (m_Metalness < 0.001f && m_Metalness > -0.001f)
+				kd = { 1 - f.r, 1 - f.g, 1 - f.b };
+			else
+				kd = { 0.f, 0.f, 0.f };
+
+			ColorRGB diffuse = BRDF::Lambert(kd, m_Albedo);
+			return ((f * d * g) / denominator) + diffuse;
+
 		}
 
 	private:

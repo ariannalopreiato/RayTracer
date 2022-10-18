@@ -47,7 +47,7 @@ void Renderer::Render(Scene* pScene) const
 			//ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
 
 			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
-			Vector3 rayDirection = cameraToWorld.TransformVector({ x,y,1 });
+			Vector3 rayDirection = cameraToWorld.TransformVector({ x,y,1 }).Normalized();
 			Ray viewRay{ camera.origin, rayDirection };
 			ColorRGB finalColor{};
 			HitRecord closestHit{};
@@ -55,8 +55,6 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				//finalColor = materials[closestHit.materialIndex]->Shade(); //if it hits the pixel give it color
-
 				auto lights = pScene->GetLights(); //get all the lights of the scene
 
 				for (const auto& light : lights) //loop all lights
@@ -65,16 +63,32 @@ void Renderer::Render(Scene* pScene) const
 					Vector3 direction = LightUtils::GetDirectionToLight(light, startPoint); //vector from hit point to light
 					Ray lightRay{ startPoint, direction }; //calculate the light ray
 					lightRay.max = lightRay.direction.Normalize();
-
 					float lambertLaw = Vector3::Dot(closestHit.normal, direction.Normalized());
-					if (lambertLaw > 0)
+
+					if (pScene->DoesHit(lightRay) && m_ShadowsEnabled)
+						continue;
+
+					ColorRGB radiance = LightUtils::GetRadiance(light, startPoint);
+					ColorRGB brdf = materials[closestHit.materialIndex]->Shade(closestHit, lightRay.direction, -rayDirection);
+
+					switch (m_CurrentLightingMode)
 					{
-						auto brdf = materials[closestHit.materialIndex]->Shade(closestHit, -lightRay.direction, rayDirection);
-						auto radiance = LightUtils::GetRadiance(light, startPoint);
-						finalColor += radiance * brdf * lambertLaw;
+					case LightingMode::ObservedArea:
+						if (lambertLaw > 0)
+							finalColor += {lambertLaw, lambertLaw, lambertLaw};
+						break;
+					case LightingMode::Radiance:
+						finalColor += radiance;
+						break;
+					case LightingMode::BRDF:
+						finalColor += brdf;
+						break;
+					case LightingMode::Combined:
+						if (lambertLaw > 0)
+							finalColor += radiance * brdf * lambertLaw;
+						break;
 					}
-					if (pScene->DoesHit(lightRay))
-						finalColor *= 0.5;
+
 				}
 			}
 
@@ -96,4 +110,23 @@ void Renderer::Render(Scene* pScene) const
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
+}
+
+void dae::Renderer::CycleLightMode()
+{
+	switch (m_CurrentLightingMode)
+	{
+	case LightingMode::Combined:
+		m_CurrentLightingMode = LightingMode::ObservedArea;
+		break;
+	case LightingMode::ObservedArea:
+		m_CurrentLightingMode = LightingMode::Radiance;
+		break;
+	case LightingMode::Radiance:
+		m_CurrentLightingMode = LightingMode::BRDF;
+		break;
+	case LightingMode::BRDF:
+		m_CurrentLightingMode = LightingMode::Combined;
+		break;
+	}
 }
