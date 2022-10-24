@@ -123,20 +123,29 @@ namespace dae
 
 		void CalculateNormals()
 		{
-			assert(false && "No Implemented Yet!");
+			for (int i = 0; i < indices.size(); ++i)
+			{
+				Vector3 edgeA = positions[indices[i]];
+				Vector3 edgeB = positions[indices[++i]];
+				Vector3 edgeC = positions[indices[++i]];
+				auto normal = Vector3::Cross(edgeB - edgeA, edgeC - edgeB).Normalized();
+				normals.push_back(normal);
+			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
 			//Calculate Final Transform 
 			//const auto finalTransform = ...
 
 			//Transform Positions (positions > transformedPositions)
 			//...
-
+			for(const auto& p : positions)
+				transformedPositions.push_back(p);
 			//Transform Normals (normals > transformedNormals)
 			//...
+			for (const auto& n : normals)
+				transformedNormals.push_back(n);
 		}
 	};
 #pragma endregion

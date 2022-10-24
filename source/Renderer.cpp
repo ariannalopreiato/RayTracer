@@ -27,7 +27,7 @@ void Renderer::Render(Scene* pScene) const
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
 	
-	float fov = std::tan((camera.fovAngle * M_PI / 180) / 2);
+	float fov = float(std::tan((camera.fovAngle * M_PI / 180) / 2));
 	float aspectRatio = float(m_Width) / float(m_Height);
 
 	for (int px{}; px < m_Width; ++px)

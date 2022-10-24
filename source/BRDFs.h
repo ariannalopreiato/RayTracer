@@ -64,7 +64,7 @@ namespace dae
 		{
 			float dotSq = powf(std::max(0.f, Vector3::Dot(n, h)), 2.f);
 			float denominator = dotSq * ((roughness * roughness) - 1) + 1;
-			return (roughness * roughness) / (M_PI * powf(denominator, 2.f));
+			return (roughness * roughness) / (float(M_PI) * powf(denominator, 2.f));
 		}
 
 		/**
