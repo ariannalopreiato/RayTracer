@@ -106,15 +106,15 @@ namespace dae
 		{
 			int startIndex = static_cast<int>(positions.size());
 
-			positions.push_back(triangle.v0);
-			positions.push_back(triangle.v1);
-			positions.push_back(triangle.v2);
+			positions.emplace_back(triangle.v0);
+			positions.emplace_back(triangle.v1);
+			positions.emplace_back(triangle.v2);
 
-			indices.push_back(startIndex);
-			indices.push_back(++startIndex);
-			indices.push_back(++startIndex);
+			indices.emplace_back(startIndex);
+			indices.emplace_back(++startIndex);
+			indices.emplace_back(++startIndex);
 
-			normals.push_back(triangle.normal);
+			normals.emplace_back(triangle.normal);
 
 			//Not ideal, but making sure all vertices are updated
 			if(!ignoreTransformUpdate)
@@ -129,23 +129,36 @@ namespace dae
 				Vector3 edgeB = positions[indices[++i]];
 				Vector3 edgeC = positions[indices[++i]];
 				auto normal = Vector3::Cross(edgeB - edgeA, edgeC - edgeB).Normalized();
-				normals.push_back(normal);
+				normals.emplace_back(normal);
 			}
 		}
 
 		void UpdateTransforms()
 		{
+			transformedPositions.clear();
+			transformedNormals.clear();
+
+			transformedPositions.reserve(positions.size());
+			transformedNormals.reserve(normals.size());
+
 			//Calculate Final Transform 
-			//const auto finalTransform = ...
+			const auto finalTransform = translationTransform * rotationTransform * scaleTransform;
 
 			//Transform Positions (positions > transformedPositions)
 			//...
-			for(const auto& p : positions)
-				transformedPositions.push_back(p);
+			for (const auto& p : positions)
+			{
+				auto transformedP = finalTransform.TransformPoint(p);
+				transformedPositions.emplace_back(transformedP);
+			}
+
 			//Transform Normals (normals > transformedNormals)
 			//...
 			for (const auto& n : normals)
-				transformedNormals.push_back(n);
+			{
+				auto transformedN = finalTransform.TransformVector(n);
+				transformedNormals.emplace_back(transformedN);
+			}
 		}
 	};
 #pragma endregion

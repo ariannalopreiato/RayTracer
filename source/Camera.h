@@ -38,7 +38,8 @@ namespace dae
 		{
 			right = Vector3::Cross({0, 1, 0}, forward).Normalized();
 			up = Vector3::Cross(forward, right).Normalized();
-			return Matrix{ right, up, forward, origin };
+			cameraToWorld = { right, up, forward, origin };
+			return cameraToWorld;
 		}
 
 		void Update(Timer* pTimer)

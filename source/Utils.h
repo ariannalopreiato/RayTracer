@@ -147,21 +147,22 @@ namespace dae
 			bool result{};
 			HitRecord currentHit{};
 			int normalCount{};
+			Triangle triangle{};
+			triangle.cullMode = mesh.cullMode;
+			triangle.materialIndex = mesh.materialIndex;
 
 			for (int i = 0; i < mesh.indices.size(); ++i)
 			{
-				Vector3 pointA = mesh.transformedPositions[mesh.indices[i]];
-				Vector3 pointB = mesh.transformedPositions[mesh.indices[++i]];
-				Vector3 pointC = mesh.transformedPositions[mesh.indices[++i]];
+				triangle.v0 = mesh.transformedPositions[mesh.indices[i]];
+				triangle.v1 = mesh.transformedPositions[mesh.indices[++i]];
+				triangle.v2 = mesh.transformedPositions[mesh.indices[++i]];
 
-				Triangle triangle = { pointA, pointB, pointC };
-				triangle.cullMode = mesh.cullMode;
-				triangle.materialIndex = mesh.materialIndex;
 				triangle.normal = mesh.transformedNormals[normalCount];
 
 				bool current = HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord); //check if triangle hits
 
 				++normalCount;
+
 				if (current) //if it hits return true
 					return current;
 			}
@@ -266,7 +267,7 @@ namespace dae
 					int k = 0;
 				}
 
-				normals.push_back(normal);
+				normals.emplace_back(normal);
 			}
 
 			return true;
