@@ -129,9 +129,9 @@ namespace dae {
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
 		yaw *= TO_RADIANS;
-		Vector4 xAxis{ cos(yaw), 0.f, -sin(yaw), 0.f};
+		Vector4 xAxis{ cos(yaw), 0.f, sin(yaw), 0.f};
 		Vector4 yAxis{ 0.f, 1.f, 0.f, 0.f };
-		Vector4 zAxis{ sin(yaw), 0.f, cos(yaw), 0.f};
+		Vector4 zAxis{ -sin(yaw), 0.f, cos(yaw), 0.f};
 		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
 		return Matrix{ xAxis, yAxis, zAxis, t };
 	}
@@ -139,8 +139,8 @@ namespace dae {
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
 		roll *= TO_RADIANS;
-		Vector4 xAxis{ cos(roll), sin(roll), 0.f, 0.f};
-		Vector4 yAxis{ -sin(roll), cos(roll), 0.f , 0.f};
+		Vector4 xAxis{ cos(roll), -sin(roll), 0.f, 0.f};
+		Vector4 yAxis{ sin(roll), cos(roll), 0.f , 0.f};
 		Vector4 zAxis{ 0.f, 0.f, 1.f , 0.f };
 		Vector4 t{ 0.f, 0.f, 0.f, 1.f };
 		return Matrix{ xAxis, yAxis, zAxis, t };

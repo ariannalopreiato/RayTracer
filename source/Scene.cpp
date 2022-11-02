@@ -251,8 +251,7 @@ namespace dae {
 	void Scene_W4_BunnyScene::Initialize()
 	{
 		sceneName = "Bunny Scene";
-		//m_Camera.origin = { 0.f, 3.f, -9.f };
-		m_Camera.origin = { 0.f, 1.f, -5.f };
+		m_Camera.origin = { 0.f, 3.f, -9.f };
 		m_Camera.fovAngle = 45.f;
 
 		//Materials
@@ -266,30 +265,13 @@ namespace dae {
 		AddPlane(Vector3{ 5.f, 0.f, 0.f }, Vector3{ -1.f, 0.f, 0.f }, matLambert_GrayBlue); //right
 		AddPlane(Vector3{ -5.f, 0.f, 0.f }, Vector3{ 1.f, 0.f, 0.f }, matLambert_GrayBlue); //left
 
-		//Triangle
-		//std::vector<int> indices;
-		//indices.push_back(0);
-		//indices.push_back(1);
-		//indices.push_back(2);
-		//const auto triangle = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
-		//triangle->positions = { { -0.75f, -1.f, 0.f }, 
-		//						{ -0.75f, 1.f, 0.f }, 
-		//						{ 0.75f, 1.f, 1.f }, 
-		//						{ 0.75f, -1.f, 0.f } };
-		//triangle->indices = { 0,1,2,
-		//					 0,2,3 };
-		//triangle->CalculateNormals();
-		//triangle->Translate({ 0.f, 1.5f, 0.f });
-		//triangle->UpdateTransforms();
-
 		pMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
-		Utils::ParseOBJ("Resources/simple_cube.obj",
+		Utils::ParseOBJ("Resources/lowpoly_bunny2.obj",
 			pMesh->positions,
 			pMesh->normals,
 			pMesh->indices);
 
-		//pMesh->Scale({ 2.f, 2.f, 2.f });
-		pMesh->Scale({ 0.7f, 0.7f, 0.7f });
+		pMesh->Scale({ 2.f, 2.f, 2.f });
 		pMesh->Translate({ 0.f, 1.f, 0.f });
 		pMesh->UpdateTransforms();
 
@@ -302,7 +284,7 @@ namespace dae {
 	void Scene_W4_BunnyScene::Update(Timer* pTimer)
 	{
 		Scene::Update(pTimer);
-		//pMesh->RotateY(PI_DIV_2 * pTimer->GetTotal());
+		pMesh->RotateY(PI_DIV_2 * pTimer->GetTotal());
 		pMesh->UpdateTransforms();
 	}
 #pragma endregion
