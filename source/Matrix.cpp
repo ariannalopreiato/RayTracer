@@ -148,9 +148,9 @@ namespace dae {
 
 	Matrix Matrix::CreateRotation(const Vector3& r)
 	{
-		auto x = CreateRotationX(r.x);
-		auto y = CreateRotationY(r.y);
-		auto z = CreateRotationZ(r.z);
+		Matrix x = CreateRotationX(r.x);
+		Matrix y = CreateRotationY(r.y);
+		Matrix z = CreateRotationZ(r.z);
 
 		return { x * y * z };
 	}

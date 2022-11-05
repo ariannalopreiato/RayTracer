@@ -46,16 +46,16 @@ namespace dae
 		{
 			moveFactor = 1.f;
 
-			const float deltaTime = pTimer->GetElapsed();
+			const float deltaTime{ pTimer->GetElapsed() };
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-			if (pKeyboardState[SDL_SCANCODE_W])
+			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_UP])
 				origin.z += moveFactor;
-			if (pKeyboardState[SDL_SCANCODE_S])
+			if (pKeyboardState[SDL_SCANCODE_S] || pKeyboardState[SDL_SCANCODE_DOWN])
 				origin.z -= moveFactor;
-			if (pKeyboardState[SDL_SCANCODE_A])
+			if (pKeyboardState[SDL_SCANCODE_A] || pKeyboardState[SDL_SCANCODE_LEFT])
 				origin.x -= moveFactor;
-			if (pKeyboardState[SDL_SCANCODE_D])
+			if (pKeyboardState[SDL_SCANCODE_D] || pKeyboardState[SDL_SCANCODE_RIGHT])
 				origin.x += moveFactor;
 
 			//Mouse Input
@@ -65,12 +65,13 @@ namespace dae
 			{
 				if (pKeyboardState[SDL_SCANCODE_LSHIFT] || pKeyboardState[SDL_SCANCODE_RSHIFT])
 					moveFactor += 4.f;
+
 				if ((mouseState & SDL_BUTTON_RMASK) != 0)
 				{
 					if (mouseY < 0)
-						origin.y -= moveFactor;
+						origin.y += moveFactor;
 					if (mouseY > 0)
-						origin.y += moveFactor;				
+						origin.y -= moveFactor;				
 				}
 				else
 				{
@@ -79,7 +80,7 @@ namespace dae
 					if (mouseY > 0)
 						origin.z -= moveFactor;
 
-					totalYaw += mouseX * deltaTime;
+					totalYaw -= mouseX * deltaTime;
 				}
 			}
 			else 
@@ -87,10 +88,10 @@ namespace dae
 				if ((mouseState & SDL_BUTTON_RMASK) != 0)
 				{
 					totalPitch -= mouseY * deltaTime;
-					totalYaw += mouseX * deltaTime;
+					totalYaw -= mouseX * deltaTime;
 				}
 			}
-			Matrix rotation = Matrix::CreateRotation(totalPitch, totalYaw, 0.f);
+			const Matrix rotation{ Matrix::CreateRotation(totalPitch, totalYaw, 0.f) };
 			forward = rotation.TransformVector(Vector3::UnitZ);
 			forward.Normalize();
 		}

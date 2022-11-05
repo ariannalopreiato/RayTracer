@@ -15,8 +15,8 @@
 
 using namespace dae;
 
-#define ASYNC
-//#define PARALLEL_FOR
+//#define ASYNC
+#define PARALLEL_FOR
 
 Renderer::Renderer(SDL_Window * pWindow) :
 	m_pWindow(pWindow),
@@ -29,15 +29,15 @@ Renderer::Renderer(SDL_Window * pWindow) :
 
 void Renderer::Render(Scene* pScene) const
 {
-	Camera& camera = pScene->GetCamera();
+	Camera& camera{ pScene->GetCamera() };
 	camera.CalculateCameraToWorld();
 
-	const float fovAngle = camera.fovAngle * TO_RADIANS;
-	const float fov = tan(fovAngle / 2.f);
-	const float aspectRatio = float(m_Width) / float(m_Height);
+	const float fovAngle{ camera.fovAngle * TO_RADIANS };
+	const float fov{ tan(fovAngle / 2.f) };
+	const float aspectRatio{ float(m_Width) / float(m_Height) };
 
-	auto& materials = pScene->GetMaterials();
-	auto& lights = pScene->GetLights();
+	const auto& materials{ pScene->GetMaterials() };
+	const auto& lights{ pScene->GetLights() };
 
 	const uint32_t numPixels{ uint32_t(m_Width * m_Height) };
 
@@ -119,37 +119,36 @@ void Renderer::CycleLightMode()
 void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIdx, float fov, float aspectRatio, const Camera& camera, 
 							const std::vector<Light>& lights, const std::vector<Material*>& materials) const
 {
-	const int px = pixelIdx % m_Width;
-	const int py = pixelIdx / m_Width;
+	const int px{ int(pixelIdx) % m_Width };
+	const int py{ int(pixelIdx) / m_Width };
 
-	float x = float(((2 * (px + 0.5)) / m_Width) - 1) * aspectRatio * fov;
-	float y = (1 - float((2 * (py + 0.5)) / m_Height)) * fov;
+	const float x{ float(((2 * (px + 0.5)) / m_Width) - 1) * aspectRatio * fov };
+	const float y{ (1 - float((2 * (py + 0.5)) / m_Height)) * fov };
 	
-	Vector3 rayDirection = Vector3(x, y, 1);
-	rayDirection = camera.cameraToWorld.TransformVector(rayDirection).Normalized();
+	const Vector3 rayDirection{ camera.cameraToWorld.TransformVector({ x, y, 1 }).Normalized() };
 
-	Ray viewRay{ camera.origin, rayDirection };
+	const Ray viewRay{ camera.origin, rayDirection };
 	ColorRGB finalColor{};
 	HitRecord closestHit{};
 	pScene->GetClosestHit(viewRay, closestHit);
 
 	if (closestHit.didHit)
 	{
-		auto& lights = pScene->GetLights(); //get all the lights of the scene
+		const auto& lights{ pScene->GetLights() }; //get all the lights of the scene
 
-		for (const auto& light : lights) //loop all lights
+		for (const dae::Light& light : lights) //loop all lights
 		{
-			Vector3 startPoint = closestHit.origin + closestHit.normal * 0.01f; //the point that just got hit
-			Vector3 direction = LightUtils::GetDirectionToLight(light, startPoint); //vector from hit point to light
+			const Vector3 startPoint{ closestHit.origin + closestHit.normal * 0.01f }; //the point that just got hit
+			const Vector3 direction{ LightUtils::GetDirectionToLight(light, startPoint) }; //vector from hit point to light
 			Ray lightRay{ startPoint, direction }; //calculate the light ray
 			lightRay.max = lightRay.direction.Normalize();
-			float lambertLaw = Vector3::Dot(closestHit.normal, direction.Normalized());
+			const float lambertLaw{ Vector3::Dot(closestHit.normal, direction.Normalized()) };
 
 			if (pScene->DoesHit(lightRay) && m_ShadowsEnabled)
 				continue;
 
-			ColorRGB radiance = LightUtils::GetRadiance(light, startPoint);
-			ColorRGB brdf = materials[closestHit.materialIndex]->Shade(closestHit, lightRay.direction, -rayDirection);
+			const ColorRGB radiance{ LightUtils::GetRadiance(light, startPoint) };
+			const ColorRGB brdf{ materials[closestHit.materialIndex]->Shade(closestHit, lightRay.direction, -rayDirection) };
 
 			switch (m_CurrentLightingMode)
 			{

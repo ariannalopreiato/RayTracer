@@ -38,7 +38,7 @@ namespace dae
 		{
 		}
 
-		ColorRGB Shade(const HitRecord& hitRecord, const Vector3& l, const Vector3& v) override
+		ColorRGB Shade(const HitRecord&, const Vector3&, const Vector3&) override
 		{
 			return m_Color;
 		}
@@ -119,7 +119,7 @@ namespace dae
 			float g = BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness * m_Roughness);
 
 			float denominator = 4 * Vector3::Dot(v, hitRecord.normal) * Vector3::Dot(l, hitRecord.normal);
-			//ColorRGB ks = ;
+
 			ColorRGB kd{};
 			if (m_Metalness < 0.001f && m_Metalness > -0.001f)
 				kd = { 1 - f.r, 1 - f.g, 1 - f.b };

@@ -32,9 +32,9 @@ namespace dae
 		 */
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{		
-			Vector3 reflect = Vector3::Reflect(n, l);
-			float cosine = std::max(0.f, Vector3::Dot(reflect, v));
-			float phong = ks * pow(cosine, exp);
+			const Vector3 reflect{ Vector3::Reflect(n, l) };
+			const float cosine{ std::max(0.f, Vector3::Dot(reflect, v)) };
+			const float phong{ ks * pow(cosine, exp) };
 			return ColorRGB{ phong, phong, phong };
 		}
 
@@ -47,9 +47,9 @@ namespace dae
 		 */
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
-			ColorRGB start = { 1 - f0.r, 1 - f0.g, 1 - f0.b };
-			float dot = std::max(0.f, Vector3::Dot(h, v));
-			auto power = powf(1 - dot, 5.f);
+			const ColorRGB start { 1 - f0.r, 1 - f0.g, 1 - f0.b };
+			const float dot{ std::max(0.f, Vector3::Dot(h, v)) };
+			const float power{ powf(1 - dot, 5.f) };
 			return f0 + start * power;
 		}
 
@@ -62,8 +62,8 @@ namespace dae
 		 */
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
-			float dotSq = powf(std::max(0.f, Vector3::Dot(n, h)), 2.f);
-			float denominator = dotSq * ((roughness * roughness) - 1) + 1;
+			const float dotSq{ powf(std::max(0.f, Vector3::Dot(n, h)), 2.f) };
+			const float denominator{ dotSq * ((roughness * roughness) - 1) + 1 };
 			return (roughness * roughness) / (float(M_PI) * powf(denominator, 2.f));
 		}
 
@@ -76,8 +76,8 @@ namespace dae
 		 */
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
-			float k = ((roughness + 1) * (roughness + 1)) / 8;
-			float dotNormalView = std::max(0.f, Vector3::Dot(n, v));
+			const float k{ ((roughness + 1) * (roughness + 1)) / 8 };
+			const float dotNormalView{ std::max(0.f, Vector3::Dot(n, v)) };
 			return dotNormalView / ((dotNormalView * (1 - k)) + k);
 		}
 
@@ -91,8 +91,8 @@ namespace dae
 		 */
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
-			float masking = GeometryFunction_SchlickGGX(n, v, roughness);
-			float shadowing = GeometryFunction_SchlickGGX(n, l, roughness);
+			const float masking{ GeometryFunction_SchlickGGX(n, v, roughness) };
+			const float shadowing{ GeometryFunction_SchlickGGX(n, l, roughness) };
 			return masking * shadowing;
 		}
 
