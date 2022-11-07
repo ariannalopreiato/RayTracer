@@ -75,49 +75,84 @@ namespace dae
 #pragma endregion
 #pragma region Triangle HitTest
 		//TRIANGLE HIT-TESTS
+		//https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+		
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			const Vector3 a{ triangle.v1 - triangle.v0 };
-			const Vector3 b{ triangle.v2 - triangle.v1 };
-			const Vector3 c{ triangle.v0 - triangle.v2 };
+			const float dotNV{ Vector3::Dot(triangle.normal, ray.direction) };
 
-			//check if they are perpendicular
-			if (Vector3::Dot(triangle.normal, ray.direction) == 0)
+			if (dotNV == 0)
 				return false;
-
-			const Vector3 center{ (triangle.v0 + triangle.v1 + triangle.v2) / 3 }; //center of the triangle
-			const Vector3 L{ center - ray.origin };
-
-			const float t{ Vector3::Dot(L, triangle.normal) / Vector3::Dot(ray.direction, triangle.normal) }; //plane intersection
-			if (t < ray.min || t > ray.max) //range check
-				return false;
-
-			//check if p is on the correct side of the triangle
-			const Vector3 p{ ray.origin + (t * ray.direction) }; //point inside of the triangle
-			const Vector3 pointA{ p - triangle.v0 };
-			const Vector3 pointB{ p - triangle.v1 };
-			const Vector3 pointC{ p - triangle.v2 };
-
-			if (Vector3::Dot(triangle.normal, Vector3::Cross(a, pointA)) < 0 || Vector3::Dot(triangle.normal, Vector3::Cross(b, pointB)) < 0
-				|| Vector3::Dot(triangle.normal, Vector3::Cross(c, pointC)) < 0)
-				return false;
-
 
 			if (triangle.cullMode == TriangleCullMode::NoCulling && ignoreHitRecord)
-				return true;
+				return false;
 
-			if (Vector3::Dot(triangle.normal, ray.direction) > 0)
+			if (dotNV > 0)
 			{
 				if ((triangle.cullMode == TriangleCullMode::FrontFaceCulling && ignoreHitRecord) || triangle.cullMode == TriangleCullMode::BackFaceCulling)
 					return false;
 			}
-
-			if (Vector3::Dot(triangle.normal, ray.direction) < 0)
+			if (dotNV < 0)
 			{
 				if ((triangle.cullMode == TriangleCullMode::FrontFaceCulling) || triangle.cullMode == TriangleCullMode::BackFaceCulling && ignoreHitRecord)
 					return false;
 			}
 
+			const Vector3 firstEdge{ triangle.v1 - triangle.v0 };
+			const Vector3 secondEdge{ triangle.v2 - triangle.v0 };
+
+			const Vector3 h{ Vector3::Cross(ray.direction, secondEdge) };
+			const float a{ Vector3::Dot(h, firstEdge) };
+
+			//check if the ray is parallel to the triangle
+			if (a > -FLT_EPSILON && a < FLT_EPSILON)
+				return false;
+
+			const float f{ 1.0f / a };
+			const Vector3 s{ ray.origin - triangle.v0 };
+			const float u{ f * Vector3::Dot(s, h) };
+
+			if (u < 0.f || u > 1.f)
+				return false;
+
+			const Vector3 q{ Vector3::Cross(s, firstEdge) };
+			const float v{ f * Vector3::Dot(ray.direction, q) };
+
+			if (v < 0.f || u + v > 1.f)
+				return false;
+
+			float t{ f * Vector3::Dot(secondEdge, q) };
+
+			if (t > FLT_EPSILON)
+			{
+				hitRecord.t = t;
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = triangle.materialIndex;
+				hitRecord.normal = triangle.normal;
+				hitRecord.origin = ray.origin + ray.direction * t;
+
+				return true;
+			}
+
+			return false;
+		}
+		////const Vector3 c{ triangle.v0 - triangle.v2 };
+			////check if they are perpendicular
+			//if (Vector3::Dot(triangle.normal, ray.direction) == 0)
+			//	return false;
+			//const Vector3 center{ (triangle.v0 + triangle.v1 + triangle.v2) / 3 }; //center of the triangle
+			//const Vector3 L{ center - ray.origin };
+			//const float t{ Vector3::Dot(L, triangle.normal) / Vector3::Dot(ray.direction, triangle.normal) }; //plane intersection
+			//if (t < ray.min || t > ray.max) //range check
+			//	return false;
+			////check if p is on the correct side of the triangle
+			//const Vector3 p{ ray.origin + (t * ray.direction) }; //point inside of the triangle
+			//const Vector3 pointA{ p - triangle.v0 };
+			//const Vector3 pointB{ p - triangle.v1 };
+			//const Vector3 pointC{ p - triangle.v2 };
+			//if (Vector3::Dot(triangle.normal, Vector3::Cross(firstEdge, pointA)) < 0 || Vector3::Dot(triangle.normal, Vector3::Cross(secondEdge, pointB)) < 0
+			//	|| Vector3::Dot(triangle.normal, Vector3::Cross(c, pointC)) < 0)
+			//	return false;
 			//if (ignoreHitRecord)
 			//{
 			//	if (triangle.cullMode == TriangleCullMode::NoCulling)
@@ -138,15 +173,6 @@ namespace dae
 			//	if (Vector3::Dot(triangle.normal, ray.direction) < 0 && triangle.cullMode == TriangleCullMode::FrontFaceCulling)
 			//		return false;
 			//}
-
-			hitRecord.didHit = true;
-			hitRecord.materialIndex = triangle.materialIndex;
-			hitRecord.normal = triangle.normal;
-			hitRecord.t = t; 
-			hitRecord.origin = p;
-
-			return true;
-		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray)
 		{
