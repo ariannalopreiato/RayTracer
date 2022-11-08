@@ -33,7 +33,7 @@ namespace dae
 				hitRecord.origin = ray.origin + (hit * ray.direction);
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
-				hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
+				hitRecord.normal = (hitRecord.origin - sphere.origin) / sphere.radius;
 				return true;
 			}
 			return false;
@@ -105,7 +105,7 @@ namespace dae
 			const float a{ Vector3::Dot(h, firstEdge) };
 
 			//check if the ray is parallel to the triangle
-			if (a > -FLT_EPSILON && a < FLT_EPSILON)
+			if (a > -0.01f && a < 0.01f)
 				return false;
 
 			const float f{ 1.0f / a };
@@ -123,7 +123,7 @@ namespace dae
 
 			float t{ f * Vector3::Dot(secondEdge, q) };
 
-			if (t > FLT_EPSILON)
+			if (t > 0.01f)
 			{
 				hitRecord.t = t;
 				hitRecord.didHit = true;

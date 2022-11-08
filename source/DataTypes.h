@@ -200,8 +200,7 @@ namespace dae
 			transformedNormals.reserve(normals.size());
 
 			//Calculate Final Transform 
-			const Matrix& finalTransform{ translationTransform * rotationTransform * scaleTransform };
-				//scaleTransform* rotationTransform * translationTransform;
+			const Matrix& finalTransform{ scaleTransform * rotationTransform * translationTransform };
 
 			//Transform Positions (positions > transformedPositions)
 			//...

@@ -286,6 +286,8 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 		m_pMesh->RotateY(PI_DIV_2 * pTimer->GetTotal());
+
+		m_pMesh->UpdateAABB();
 		m_pMesh->UpdateTransforms();
 	}
 #pragma endregion
@@ -356,10 +358,11 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 		
-		const float yawAngle = (cos(pTimer->GetTotal()) + 1.f) / 2.f * PI_2 * TO_DEGREES;
+		const float yawAngle = (cos(pTimer->GetTotal()) + 1.f) / 2.f * PI_2;
 		for (const auto& m : m_Meshes)
 		{
 			m->RotateY(yawAngle);
+			m->UpdateAABB();
 			m->UpdateTransforms();
 		}
 	}
