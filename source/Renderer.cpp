@@ -15,8 +15,8 @@
 
 using namespace dae;
 
-#define ASYNC
-//#define PARALLEL_FOR
+//#define ASYNC
+#define PARALLEL_FOR
 
 Renderer::Renderer(SDL_Window * pWindow) :
 	m_pWindow(pWindow),
@@ -167,7 +167,6 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIdx, float fov, float as
 					finalColor += radiance * brdf * lambertLaw;
 				break;
 			}
-
 		}
 	}
 

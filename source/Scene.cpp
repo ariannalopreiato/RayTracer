@@ -30,22 +30,22 @@ namespace dae {
 		HitRecord currentHit{};
 		closestHit.t = ray.max;
 
-		for (size_t plane = 0; plane < m_PlaneGeometries.size(); ++plane)
+		for (const dae::Plane& plane : m_PlaneGeometries)
 		{
-			GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, currentHit); //checks if the ray hits the plane
+			GeometryUtils::HitTest_Plane(plane, ray, currentHit); //checks if the ray hits the plane
 			if (currentHit.t < closestHit.t)
 				closestHit = currentHit;
 		}
-		for (size_t sphere = 0; sphere < m_SphereGeometries.size(); ++sphere)
+		for (const dae::Sphere& sphere : m_SphereGeometries)
 		{
-			GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, currentHit); //checks if the ray hits the sphere
+			GeometryUtils::HitTest_Sphere(sphere, ray, currentHit); //checks if the ray hits the sphere
 			if (currentHit.t < closestHit.t)
 				closestHit = currentHit;
 		}
 
-		for (size_t triangle = 0; triangle < m_TriangleMeshGeometries.size(); ++triangle)
+		for (const dae::TriangleMesh& triangle : m_TriangleMeshGeometries)
 		{
-			GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[triangle], ray, currentHit); //checks if the ray hits the triangle
+			GeometryUtils::HitTest_TriangleMesh(triangle, ray, currentHit); //checks if the ray hits the triangle
 			if (currentHit.t < closestHit.t)
 				closestHit = currentHit;
 		}
@@ -54,21 +54,21 @@ namespace dae {
 	bool Scene::DoesHit(const Ray& ray) const
 	{
 		HitRecord closestHit{};
-		for (size_t plane = 0; plane < m_PlaneGeometries.size(); ++plane)
+
+		for (const dae::Plane& plane : m_PlaneGeometries)
 		{
-			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries.at(plane), ray, closestHit, true)) //checks if the ray hits the plane
+			if (GeometryUtils::HitTest_Plane(plane, ray, closestHit, true)) //checks if the ray hits the plane
+				return true;
+		}
+		for (const dae::Sphere& sphere : m_SphereGeometries)
+		{
+			if (GeometryUtils::HitTest_Sphere(sphere, ray, closestHit, true)) //checks if the ray hits the sphere
 				return true;
 		}
 
-		for (size_t sphere = 0; sphere < m_SphereGeometries.size(); ++sphere)
+		for (const dae::TriangleMesh& triangle : m_TriangleMeshGeometries)
 		{
-			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries.at(sphere), ray, closestHit, true)) //checks if the ray hits the sphere
-				return true;
-		}
-
-		for (size_t triangle = 0; triangle < m_TriangleMeshGeometries.size(); ++triangle)
-		{
-			if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[triangle], ray, closestHit, true)) //checks if the ray hits the triangle
+			if (GeometryUtils::HitTest_TriangleMesh(triangle, ray, closestHit, true)) //checks if the ray hits the triangle
 				return true;
 		}
 
@@ -333,20 +333,20 @@ namespace dae {
 		m_Meshes[0] = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 		m_Meshes[0]->AppendTriangle(baseTriangle, true);
 		m_Meshes[0]->Translate({ -1.75f, 4.5f, 0.f });
-		m_Meshes[0]->UpdateTransforms();
 		m_Meshes[0]->UpdateAABB();
+		m_Meshes[0]->UpdateTransforms();
 
 		m_Meshes[1] = AddTriangleMesh(TriangleCullMode::FrontFaceCulling, matLambert_White);
 		m_Meshes[1]->AppendTriangle(baseTriangle, true);
 		m_Meshes[1]->Translate({ 0.f, 4.5f, 0.f });
-		m_Meshes[1]->UpdateTransforms();
 		m_Meshes[1]->UpdateAABB();
+		m_Meshes[1]->UpdateTransforms();	
 
 		m_Meshes[2] = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
 		m_Meshes[2]->AppendTriangle(baseTriangle, true);
 		m_Meshes[2]->Translate({ 1.75f, 4.5f, 0.f });
-		m_Meshes[2]->UpdateTransforms();
 		m_Meshes[2]->UpdateAABB();
+		m_Meshes[2]->UpdateTransforms();
 
 		//Light
 		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f }); //back light

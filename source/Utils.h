@@ -12,32 +12,59 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//intersection of ray with sphere
-			const float a = Vector3::Dot(ray.direction, ray.direction);
-			const float b = Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin);
-			const float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
-			const float discriminant = (b * b) - (4 * a * c);
-
-			if (discriminant <= 0.f) //the ray does not intersect the sphere or is tangent to it
+			const Vector3 l = sphere.origin - ray.origin;
+			const float tca = Vector3::Dot(l, ray.direction);
+			if (tca < 0)
 				return false;
 
-			float hit = (-b - sqrt(discriminant)) / (2 * a);
-			if (hit < ray.min)
-				hit = (-b + sqrt(discriminant)) / (2 * a);
-			if (hit >= ray.min && hit < ray.max)
+			const float od = Vector3::Dot(Vector3::Reject(l, ray.direction), Vector3::Reject(l, ray.direction));
+			if (od > sphere.radius * sphere.radius)
+				return false;
+
+			const float thc = sqrt((sphere.radius * sphere.radius) - od);
+			float t = tca - thc;
+
+			if (t < ray.min)
+				t = tca + thc;
+
+			if (t >= ray.min && t <= ray.max)
 			{
 				if (ignoreHitRecord) //if hitRecord is ignored 
-					return true;
+			   		return true;
 
-				hitRecord.t = hit;
-				hitRecord.origin = ray.origin + (hit * ray.direction);
+				hitRecord.t = t;
+				hitRecord.origin = ray.origin + (t * ray.direction);
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
 				hitRecord.normal = (hitRecord.origin - sphere.origin) / sphere.radius;
 				return true;
 			}
+
 			return false;
 		}
+
+		//intersection of ray with sphere
+			//const float a = Vector3::Dot(ray.direction, ray.direction);
+			//const float b = Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin);
+			//const float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
+			//const float discriminant = (b * b) - (4 * a * c);
+			//if (discriminant <= 0.f) //the ray does not intersect the sphere or is tangent to it
+			//	return false;
+			//float hit = (-b - sqrt(discriminant)) / (2 * a);			
+			//if (hit < ray.min)
+			//	hit = (-b + sqrt(discriminant)) / (2 * a);
+			//if (hit >= ray.min && hit < ray.max)
+			//{
+			//	if (ignoreHitRecord) //if hitRecord is ignored 
+			//		return true;
+			//	hitRecord.t = hit;
+			//	hitRecord.origin = ray.origin + (hit * ray.direction);
+			//	hitRecord.didHit = true;
+			//	hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
+			//	hitRecord.normal = (hitRecord.origin - sphere.origin) / sphere.radius;
+			//	return true;
+			//}
+			//return false;
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
 		{
@@ -125,6 +152,9 @@ namespace dae
 
 			if (t > 0.01f)
 			{
+				if (ignoreHitRecord)
+					return true;
+
 				hitRecord.t = t;
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = triangle.materialIndex;
@@ -211,7 +241,6 @@ namespace dae
 			if (!SlabTest_TriangleMesh(mesh, ray))
 				return false;
 
-			HitRecord currentHit{};
 			int normalCount{};
 			Triangle triangle{};
 			triangle.cullMode = mesh.cullMode;
@@ -230,9 +259,10 @@ namespace dae
 				++normalCount;
 
 				if (current) //if it hits return true
-					return current;
+					return true;
 			}
-			return hitRecord.didHit;
+
+			return false;
 		}
 
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)
@@ -284,11 +314,12 @@ namespace dae
 				//read the first word of the string, use the >> operator (istream::operator>>) 
 				file >> sCommand;
 				//use conditional statements to process the different commands	
-				if (sCommand == "#")
-				{
-					// Ignore Comment
-				}
-				else if (sCommand == "v")
+				//if (sCommand == "#")
+				//{
+				//	// Ignore Comment
+				//}
+				//else 
+				if (sCommand == "v")
 				{
 					//Vertex
 					float x, y, z;
@@ -322,17 +353,7 @@ namespace dae
 				Vector3 edgeV0V2 = positions[i2] - positions[i0];
 				Vector3 normal = Vector3::Cross(edgeV0V1, edgeV0V2);
 
-				if(isnan(normal.x))
-				{
-					//int k = 0;
-				}
-
 				normal.Normalize();
-				if (isnan(normal.x))
-				{
-					//int k = 0;
-				}
-
 				normals.emplace_back(normal);
 			}
 
