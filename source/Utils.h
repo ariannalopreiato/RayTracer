@@ -43,29 +43,6 @@ namespace dae
 			return false;
 		}
 
-		//intersection of ray with sphere
-			//const float a = Vector3::Dot(ray.direction, ray.direction);
-			//const float b = Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin);
-			//const float c = Vector3::Dot(ray.origin - sphere.origin, ray.origin - sphere.origin) - (sphere.radius * sphere.radius);
-			//const float discriminant = (b * b) - (4 * a * c);
-			//if (discriminant <= 0.f) //the ray does not intersect the sphere or is tangent to it
-			//	return false;
-			//float hit = (-b - sqrt(discriminant)) / (2 * a);			
-			//if (hit < ray.min)
-			//	hit = (-b + sqrt(discriminant)) / (2 * a);
-			//if (hit >= ray.min && hit < ray.max)
-			//{
-			//	if (ignoreHitRecord) //if hitRecord is ignored 
-			//		return true;
-			//	hitRecord.t = hit;
-			//	hitRecord.origin = ray.origin + (hit * ray.direction);
-			//	hitRecord.didHit = true;
-			//	hitRecord.materialIndex = sphere.materialIndex; //gives to the pixel the material of the object it hits
-			//	hitRecord.normal = (hitRecord.origin - sphere.origin) / sphere.radius;
-			//	return true;
-			//}
-			//return false;
-
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
 		{
 			HitRecord temp{};
@@ -108,20 +85,23 @@ namespace dae
 		{
 			const float dotNV{ Vector3::Dot(triangle.normal, ray.direction) };
 
-			if (dotNV == 0)
-				return false;
+			if (dotNV == 0) //perpendicular
+				return false;		
 
-			if (triangle.cullMode == TriangleCullMode::NoCulling && ignoreHitRecord)
-				return false;
-
-			if (dotNV > 0)
+			if (ignoreHitRecord)
 			{
-				if ((triangle.cullMode == TriangleCullMode::FrontFaceCulling && ignoreHitRecord) || triangle.cullMode == TriangleCullMode::BackFaceCulling)
+				if (dotNV > 0 && triangle.cullMode == TriangleCullMode::FrontFaceCulling)
+					return false;
+
+				if (dotNV < 0 && triangle.cullMode == TriangleCullMode::BackFaceCulling)
 					return false;
 			}
-			if (dotNV < 0)
+			else
 			{
-				if ((triangle.cullMode == TriangleCullMode::FrontFaceCulling) || triangle.cullMode == TriangleCullMode::BackFaceCulling && ignoreHitRecord)
+				if (dotNV < 0 && triangle.cullMode == TriangleCullMode::FrontFaceCulling)
+					return false;
+
+				if (dotNV > 0 && triangle.cullMode == TriangleCullMode::BackFaceCulling)
 					return false;
 			}
 
@@ -150,7 +130,9 @@ namespace dae
 
 			float t{ f * Vector3::Dot(secondEdge, q) };
 
-			if (t > 0.01f)
+			if (t < ray.min || t > ray.max)
+				return false;
+			else
 			{
 				if (ignoreHitRecord)
 					return true;
@@ -163,7 +145,6 @@ namespace dae
 
 				return true;
 			}
-
 			return false;
 		}
 		////const Vector3 c{ triangle.v0 - triangle.v2 };

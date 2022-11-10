@@ -134,8 +134,6 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIdx, float fov, float as
 
 	if (closestHit.didHit)
 	{
-		const auto& lights{ pScene->GetLights() }; //get all the lights of the scene
-
 		for (const dae::Light& light : lights) //loop all lights
 		{
 			const Vector3 startPoint{ closestHit.origin + closestHit.normal * 0.01f }; //the point that just got hit
