@@ -1,4 +1,4 @@
-#include "Scene.h"
+  #include "Scene.h"
 #include "Utils.h"
 #include "Material.h"
 
@@ -55,11 +55,12 @@ namespace dae {
 	{
 		HitRecord closestHit{};
 
-		for (const dae::Plane& plane : m_PlaneGeometries)
-		{
-			if (GeometryUtils::HitTest_Plane(plane, ray, closestHit, true)) //checks if the ray hits the plane
-				return true;
-		}
+		//for (const dae::Plane& plane : m_PlaneGeometries)
+		//{
+		//	if (GeometryUtils::HitTest_Plane(plane, ray, closestHit, true)) //checks if the ray hits the plane
+		//		return true;
+		//}
+
 		for (const dae::Sphere& sphere : m_SphereGeometries)
 		{
 			if (GeometryUtils::HitTest_Sphere(sphere, ray, closestHit, true)) //checks if the ray hits the sphere
@@ -285,7 +286,7 @@ namespace dae {
 	void Scene_W4_BunnyScene::Update(Timer* pTimer)
 	{
 		Scene::Update(pTimer);
-		m_pMesh->RotateY(PI_DIV_2 * pTimer->GetTotal());
+		m_pMesh->RotateY((cos(pTimer->GetTotal()) + 1.f) / 2.f * PI_2);
 
 		m_pMesh->UpdateAABB();
 		m_pMesh->UpdateTransforms();

@@ -20,7 +20,8 @@ namespace dae
 
 
 		Vector3 origin{};
-		float fovAngle{90.f};
+		float fovAngle{45.f};
+		float fov{ tanf((fovAngle * TO_RADIANS) / 2) };
 
 		float moveFactor{ 0.f };
 
@@ -32,6 +33,12 @@ namespace dae
 		float totalYaw{ 0.f };
 
 		Matrix cameraToWorld{};
+
+		/*void SetFov(float deltaFov)
+		{
+			fovAngle = deltaFov;
+			fov = tanf((fovAngle * TO_RADIANS) / 2);
+		}*/
 
 
 		Matrix CalculateCameraToWorld()

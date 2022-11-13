@@ -115,10 +115,10 @@ namespace dae
 				minAABB = positions[0];
 				maxAABB = positions[0];
 
-				for (const Vector3& p : positions)
+				for (auto& pos : positions)
 				{
-					minAABB = Vector3::Min(p, minAABB);
-					maxAABB = Vector3::Max(p, maxAABB);
+					minAABB = Vector3::Min(pos, minAABB);
+					maxAABB = Vector3::Max(pos, maxAABB);
 				}
 			}
 		}
@@ -128,30 +128,37 @@ namespace dae
 			Vector3 tMinAABB = finalTransform.TransformPoint(minAABB);
 			Vector3 tMaxAABB = tMinAABB;
 
+			//(xmax, ymin, zmin)
 			Vector3 tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, minAABB.z);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
 
+			//(xmax, ymin, zmax)
 			tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, maxAABB.z);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
 
+			//(xmin, ymin, zmax)
 			tAABB = finalTransform.TransformPoint(minAABB.x, minAABB.y, maxAABB.z);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
 
+			//(xmin, ymax, zmin)
 			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
 
+			//(xmax, ymax, zmin)
 			tAABB = finalTransform.TransformPoint(maxAABB.x, maxAABB.y, minAABB.z);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
 
+			//(xmax, ymax, zmax)
 			tAABB = finalTransform.TransformPoint(maxAABB);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
 
+			//(xmin, ymax, zmax)
 			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
 			tMinAABB = Vector3::Min(tAABB, tMinAABB);
 			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
@@ -214,7 +221,7 @@ namespace dae
 			//...
 			for (const Vector3& n : normals)
 			{
-				Vector3 transformedN = finalTransform.TransformVector(n);
+				Vector3 transformedN = rotationTransform.TransformVector(n);
 				transformedNormals.emplace_back(transformedN);
 			}
 

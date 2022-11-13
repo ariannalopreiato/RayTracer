@@ -32,8 +32,7 @@ void Renderer::Render(Scene* pScene) const
 	Camera& camera{ pScene->GetCamera() };
 	camera.CalculateCameraToWorld();
 
-	const float fovAngle{ camera.fovAngle * TO_RADIANS };
-	const float fov{ tan(fovAngle / 2.f) };
+	const float fov{ camera.fov };
 	const float aspectRatio{ float(m_Width) / float(m_Height) };
 
 	const auto& materials{ pScene->GetMaterials() };
